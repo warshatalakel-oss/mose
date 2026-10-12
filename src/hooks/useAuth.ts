@@ -26,7 +26,7 @@ export default function useAuth() {
         } catch (_) {}
         return [PRINCIPAL_USER];
     });
-    const [isAuthReady, setIsAuthReady] = useState(false);
+    const [isAuthReady, setIsAuthReady] = useState(true);
     const [authError, setAuthError] = useState<string | null>(null);
     const [currentUser, setCurrentUser] = useState<User | null>(() => {
         const storedUser = window.localStorage.getItem('current_user');

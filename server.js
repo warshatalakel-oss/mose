@@ -31,7 +31,7 @@ app.get(['/health', '/_health', '/healthz'], (_req, res) => {
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath, {
     maxAge: '1h',
-    index: false,
+    index: 'index.html',
   }));
 }
 
