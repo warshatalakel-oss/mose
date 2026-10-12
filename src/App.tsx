@@ -13,31 +13,23 @@ export default function App(): React.ReactNode {
     if (!isAuthReady) {
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-gray-100 text-gray-700">
-                <Loader2 className="h-12 w-12 animate-spin mb-4" />
-                <p className="text-lg font-semibold">جاري تهيئة الاتصال الآمن...</p>
+                <Loader2 className="h-12 w-12 animate-spin mb-4 text-cyan-600" />
+                <p className="text-lg font-semibold">جاري تهيئة النظام...</p>
             </div>
         );
     }
     
-    if (authError) {
-        return (
-            <div className="flex flex-col items-center justify-center h-screen bg-gray-100 text-gray-700 p-4 text-center">
-                <AlertTriangle className="h-16 w-16 text-red-500 mb-4" />
-                <h1 className="text-2xl font-bold text-red-600 mb-2">خطأ حرج في الاتصال</h1>
-                <p className="text-lg max-w-md">{authError}</p>
-                <button 
-                    onClick={() => window.location.reload()} 
-                    className="mt-8 px-6 py-3 bg-cyan-600 text-white font-bold rounded-lg flex items-center gap-2 hover:bg-cyan-700 transition-transform transform hover:scale-105"
-                >
-                    <RefreshCw size={18} />
-                    إعادة المحاولة
-                </button>
-            </div>
-        );
-    }
-
     if (!currentUser) {
-        return <Login onLogin={login} />;
+        return (
+            <>
+                {authError && (
+                    <div className="bg-amber-50 border-b border-amber-200 text-amber-800 px-4 py-2 text-center text-sm font-medium">
+                        {authError}
+                    </div>
+                )}
+                <Login onLogin={login} />
+            </>
+        );
     }
 
     switch (currentUser.role) {

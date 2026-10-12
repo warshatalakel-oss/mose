@@ -14,7 +14,18 @@ const PRINCIPAL_USER: User = {
 };
 
 export default function useAuth() {
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<User[]>(() => {
+        try {
+            const cached = window.localStorage.getItem('cached_school_users');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    return parsed;
+                }
+            }
+        } catch (_) {}
+        return [PRINCIPAL_USER];
+    });
     const [isAuthReady, setIsAuthReady] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
     const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -45,48 +56,78 @@ export default function useAuth() {
     }, []);
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((user: any) => {
-            if (user) {
-                setAuthError(null); 
+        let isMounted = true;
+        // Safety timeout: Always mark auth ready after 1.5s max so UI is never stuck
+        const timeoutId = setTimeout(() => {
+            if (isMounted) {
                 setIsAuthReady(true);
-            } else {
-                auth.signInAnonymously().catch((error: any) => {
-                    console.error("Critical: Anonymous sign-in failed.", error);
-                    setAuthError("فشل الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى. قد تمنع بعض الشبكات (مثل شبكات المدارس) الوصول إلى خدماتنا.");
-                    setIsAuthReady(true); 
-                });
             }
-        });
-    
-        return () => unsubscribe(); 
+        }, 1500);
+
+        try {
+            const unsubscribe = auth.onAuthStateChanged((user: any) => {
+                if (!isMounted) return;
+                clearTimeout(timeoutId);
+                if (user) {
+                    setAuthError(null); 
+                    setIsAuthReady(true);
+                } else {
+                    auth.signInAnonymously().catch((error: any) => {
+                        console.warn("Anonymous sign-in notice:", error);
+                        if (isMounted) {
+                            setIsAuthReady(true); 
+                        }
+                    });
+                }
+            });
+
+            return () => {
+                isMounted = false;
+                clearTimeout(timeoutId);
+                if (typeof unsubscribe === 'function') unsubscribe();
+            };
+        } catch (e) {
+            console.warn("Auth initialization notice:", e);
+            setIsAuthReady(true);
+        }
     }, []); 
 
     useEffect(() => {
-        if (!isAuthReady || authError) return;
+        if (!isAuthReady) return;
 
-        const usersRef = db.ref('users');
-        const callback = (snapshot: any) => {
-            const usersData = snapshot.val();
-            if (usersData) {
-                const usersList = (Object.values(usersData) as User[]).filter(u => u.role !== 'admin');
-                const allUsers = [PRINCIPAL_USER, ...usersList.filter(u => u.id !== PRINCIPAL_USER.id)];
-                setUsers(allUsers);
+        try {
+            const usersRef = db.ref('users');
+            const callback = (snapshot: any) => {
+                const usersData = snapshot.val();
+                if (usersData) {
+                    const usersList = (Object.values(usersData) as User[]).filter(u => u.role !== 'admin');
+                    const allUsers = [PRINCIPAL_USER, ...usersList.filter(u => u.id !== PRINCIPAL_USER.id)];
+                    setUsers(allUsers);
+                    try {
+                        window.localStorage.setItem('cached_school_users', JSON.stringify(allUsers));
+                    } catch (_) {}
 
-                if (currentUser && currentUser.role !== 'principal') {
-                    const latestUserData = allUsers.find(u => u.id === currentUser.id);
-                    if (latestUserData?.disabled) {
-                        alert('تم تعطيل حسابك من قبل المسؤول. سيتم تسجيل خروجك.');
-                        logout();
+                    if (currentUser && currentUser.role !== 'principal') {
+                        const latestUserData = allUsers.find(u => u.id === currentUser.id);
+                        if (latestUserData?.disabled) {
+                            alert('تم تعطيل حسابك من قبل المسؤول. سيتم تسجيل خروجك.');
+                            logout();
+                        }
                     }
+                } else {
+                    setUsers([PRINCIPAL_USER]);
                 }
-            } else {
-                setUsers([PRINCIPAL_USER]);
-            }
-        };
-        usersRef.on('value', callback);
+            };
+            const errCallback = (err: any) => {
+                console.warn("Could not sync users from database:", err);
+            };
+            usersRef.on('value', callback, errCallback);
 
-        return () => usersRef.off('value', callback);
-    }, [isAuthReady, authError, currentUser, logout]);
+            return () => usersRef.off('value', callback);
+        } catch (err) {
+            console.warn("Users sync setup notice:", err);
+        }
+    }, [isAuthReady, currentUser, logout]);
 
     const idleTimer = useRef<number | null>(null);
 
