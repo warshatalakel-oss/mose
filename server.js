@@ -10,37 +10,39 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = parseInt(process.env.PORT || '3000', 10);
 const distPath = path.join(__dirname, 'dist');
+const distIndexPath = path.join(distPath, 'index.html');
 
-// Ensure dist directory exists; build if missing
-if (!fs.existsSync(distPath) || !fs.existsSync(path.join(distPath, 'index.html'))) {
-  console.log('dist directory missing or incomplete, building app...');
+// Build production bundle if missing
+if (!fs.existsSync(distIndexPath)) {
+  console.log('Production build not found at dist/index.html. Running npm run build...');
   try {
-    execSync('npx vite build', { stdio: 'inherit' });
+    execSync('npm run build', { stdio: 'inherit', cwd: __dirname });
   } catch (err) {
-    console.error('Build error:', err);
+    console.error('Failed to run npm run build:', err);
   }
 }
 
-// Health check endpoint
-app.get('/health', (_req, res) => {
+// Health check endpoints for Cloud Run and GCP load balancer probes
+app.get(['/health', '/_health', '/healthz'], (_req, res) => {
   res.status(200).send('OK');
 });
 
-// Serve static files from dist directory
+// Serve static assets from dist directory
 if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-
-  // SPA fallback compatible with Express 4 and Express 5
-  app.use((_req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
-} else {
-  // Safety fallback
-  app.use(express.static(__dirname));
-  app.use((_req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-  });
+  app.use(express.static(distPath, {
+    maxAge: '1h',
+    index: false,
+  }));
 }
+
+// SPA fallback: always serve dist/index.html for any frontend route
+app.use((_req, res) => {
+  if (fs.existsSync(distIndexPath)) {
+    res.sendFile(distIndexPath);
+  } else {
+    res.status(503).type('text/plain').send('Application is building, please refresh in a few seconds.');
+  }
+});
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server listening on http://0.0.0.0:${port}`);
