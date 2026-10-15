@@ -2,8 +2,10 @@
 import type { SchoolSettings, Subject } from './types.ts';
 import { v4 as uuidv4 } from 'uuid';
 
-export const APP_LOGO_URL = 'https://i.imgur.com/LOT5ZxF.jpeg';
-export const APP_LOGO_FALLBACK = './logo.png';
+import { SCHOOL_LOGO_DATA_URL } from './logoBase64.ts';
+
+export const APP_LOGO_URL = SCHOOL_LOGO_DATA_URL;
+export const APP_LOGO_FALLBACK = 'https://i.imgur.com/LOT5ZxF.jpeg';
 
 export const SCHOOL_TYPES = ['نهاري', 'مسائي', 'خارجي'];
 export const SCHOOL_GENDERS = ['بنين', 'بنات', 'مختلط'];
