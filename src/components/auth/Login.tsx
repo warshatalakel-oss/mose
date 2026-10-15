@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LogIn, Key, Eye, EyeOff } from 'lucide-react';
-import { APP_LOGO_URL, APP_LOGO_FALLBACK } from '../../constants.ts';
+import { APP_LOGO_URL } from '../../constants.ts';
 
 interface LoginProps {
     onLogin: (identifier: string, secret: string) => Promise<boolean>;
@@ -11,7 +11,6 @@ export default function Login({ onLogin }: LoginProps) {
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCode, setShowCode] = useState(false);
-    const [imgSrc, setImgSrc] = useState(APP_LOGO_URL);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,14 +40,9 @@ export default function Login({ onLogin }: LoginProps) {
                 <div className="text-center space-y-3">
                     <div className="mx-auto w-36 h-36 flex items-center justify-center rounded-2xl bg-slate-50 p-2 shadow-sm border border-slate-200 overflow-hidden">
                         <img 
-                            src={imgSrc} 
+                            src={APP_LOGO_URL} 
                             alt="شعار مدرسة مصباح الهدى الأساسية" 
                             className="max-h-full max-w-full object-contain"
-                            onError={() => {
-                                if (imgSrc !== APP_LOGO_FALLBACK) {
-                                    setImgSrc(APP_LOGO_FALLBACK);
-                                }
-                            }}
                         />
                     </div>
                     <div>
