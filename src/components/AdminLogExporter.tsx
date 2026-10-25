@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import type { ClassData, SchoolSettings, Student, StudentResult, CalculatedGrade } from '../types.ts';
-import { GRADE_LEVELS } from '../constants.ts';
+import { GRADE_LEVELS, APP_LOGO_URL } from '../constants.ts';
 import { calculateStudentResult } from '../lib/gradeCalculator.ts';
 import AdminReportCard from './AdminReportCard.tsx';
 import { Loader2, FileDown } from 'lucide-react';
@@ -12,7 +12,7 @@ declare const html2canvas: any;
 export default function AdminLogExporter({ classes, settings }: { classes: ClassData[], settings: SchoolSettings }) {
     const [selectedStage, setSelectedStage] = useState('');
     const [selectedClassIds, setSelectedClassIds] = useState<string[]>([]);
-    const [logos, setLogos] = useState<{ ministry: string | null; school: string | null }>({ ministry: null, school: null });
+    const [logos, setLogos] = useState<{ ministry: string | null; school: string | null }>({ ministry: null, school: APP_LOGO_URL });
     const [isExporting, setIsExporting] = useState(false);
     const [exportProgress, setExportProgress] = useState(0);
     const [exportWithGrades, setExportWithGrades] = useState<boolean>(true);
@@ -145,8 +145,8 @@ export default function AdminLogExporter({ classes, settings }: { classes: Class
                 >
                     اختیار ملف
                 </button>
-                <span className={`text-sm ${logos[type] ? 'text-green-600' : 'text-gray-500'}`}>
-                    {logos[type] ? 'تم رفع الملف' : 'لم يتم اختيار أي ملف'}
+                <span className={`text-sm ${logos[type] ? 'text-green-600 font-medium' : 'text-gray-500'}`}>
+                    {logos[type] ? (type === 'school' && logos[type] === APP_LOGO_URL ? 'شعار المدرسة محمل افتراضياً' : 'تم اختيار ملف') : 'لم يتم اختيار أي ملف'}
                 </span>
             </div>
             <input id={`logo-upload-${type}`} type="file" onChange={onChange} accept="image/*" className="hidden" />

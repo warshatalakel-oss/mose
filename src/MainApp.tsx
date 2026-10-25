@@ -478,7 +478,7 @@ export default function MainApp({ currentUser, onLogout, users, addUser, updateU
                 case 'teacher_log_exporter':
                     return <TeacherLogExporter classes={principalClasses} settings={effectiveSettings} />;
                 case 'admin_log_exporter':
-                    return <Archive />;
+                    return <AdminLogExporter classes={principalClasses} settings={effectiveSettings} />;
                 case 'primary_school_log':
                     return <PrimaryLogExporter classes={principalClasses} settings={effectiveSettings} />;
                 case 'principal_dashboard':
