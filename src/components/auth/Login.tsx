@@ -38,11 +38,11 @@ export default function Login({ onLogin }: LoginProps) {
             <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-6 border border-slate-200">
                 {/* School Logo */}
                 <div className="text-center space-y-3">
-                    <div className="mx-auto w-36 h-36 flex items-center justify-center rounded-2xl bg-slate-50 p-2 shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="mx-auto w-64 h-36 flex items-center justify-center rounded-2xl bg-white p-2 shadow-sm border border-slate-200 overflow-hidden">
                         <img 
                             src={APP_LOGO_URL} 
                             alt="شعار مدرسة مصباح الهدى الأساسية" 
-                            className="max-h-full max-w-full object-contain"
+                            className="max-h-full max-w-full object-contain filter drop-shadow-sm"
                         />
                     </div>
                     <div>
