@@ -5,9 +5,8 @@ import { GRADE_LEVELS, APP_LOGO_URL } from '../constants.ts';
 import { calculateStudentResult } from '../lib/gradeCalculator.ts';
 import AdminReportCard from './AdminReportCard.tsx';
 import { Loader2, FileDown } from 'lucide-react';
-
-declare const jspdf: any;
-declare const html2canvas: any;
+import html2canvas from 'html2canvas-pro';
+import { jsPDF } from 'jspdf';
 
 export default function AdminLogExporter({ classes, settings }: { classes: ClassData[], settings: SchoolSettings }) {
     const [selectedStage, setSelectedStage] = useState('');
@@ -63,13 +62,6 @@ export default function AdminLogExporter({ classes, settings }: { classes: Class
         setIsExporting(true);
         setExportProgress(0);
 
-        if (typeof jspdf === 'undefined' || typeof html2canvas === 'undefined') {
-            alert("خطأ: مكتبة تصدير PDF غير محملة.");
-            setIsExporting(false);
-            return;
-        }
-
-        const { jsPDF } = jspdf;
         const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
         
         const tempContainer = document.createElement('div');

@@ -39,9 +39,9 @@ const VerticalHeader: React.FC<{ children: React.ReactNode; className?: string; 
 };
 
 
-const GradeCell: React.FC<{ value: number | null | undefined, className?: string }> = ({ value, className = '' }) => {
+const GradeCell: React.FC<{ value: number | null | undefined, className?: string, style?: React.CSSProperties }> = ({ value, className = '', style }) => {
     return (
-        <td className={`border-2 border-black text-center font-bold text-lg p-1 ${className}`}>
+        <td className={`border-2 border-black text-center font-bold text-lg p-1 ${className}`} style={{ borderColor: '#000', ...style }}>
             {value ?? ''}
         </td>
     );
@@ -74,9 +74,9 @@ export default function AdminReportCard({ student, classData, settings, studentR
             <header className="flex justify-between items-center mb-2">
                 {renderLogo(logos.ministry, 'شعار الوزارة')}
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-red-600">سجل</h1>
-                    <h2 className="text-2xl font-bold text-red-600">الدرجات للمدارس المتوسطة والثانوية</h2>
-                    <p className="text-xl font-bold text-blue-700 mt-1">السنة الدراسية: {settings.academicYear}</p>
+                    <h1 className="text-3xl font-bold text-red-600" style={{ color: '#dc2626' }}>سجل</h1>
+                    <h2 className="text-2xl font-bold text-red-600" style={{ color: '#dc2626' }}>الدرجات للمدارس المتوسطة والثانوية</h2>
+                    <p className="text-xl font-bold text-blue-700 mt-1" style={{ color: '#1d4ed8' }}>السنة الدراسية: {settings.academicYear}</p>
                 </div>
                 {renderLogo(logos.school, 'شعار المدرسة')}
             </header>
@@ -87,13 +87,13 @@ export default function AdminReportCard({ student, classData, settings, studentR
                 <div className="col-span-2 text-center my-1">
                     <p className="text-2xl font-extrabold">{student.name}</p>
                 </div>
-                <div className="text-right"><span className="text-green-600">الصف والشعبة:</span> {classData.stage} / {classData.section}</div>
-                 <div className="text-left"><span className="text-red-600">المواليد:</span> {student.birthDate || ''}</div>
+                <div className="text-right"><span className="text-green-600" style={{ color: '#16a34a' }}>الصف والشعبة:</span> {classData.stage} / {classData.section}</div>
+                 <div className="text-left"><span className="text-red-600" style={{ color: '#dc2626' }}>المواليد:</span> {student.birthDate || ''}</div>
             </div>
 
             <main className="flex-grow">
-                <table className="w-full border-collapse border-2 border-black">
-                    <thead className="bg-yellow-400 text-black font-bold">
+                <table className="w-full border-collapse border-2 border-black" style={{ borderColor: '#000000' }}>
+                    <thead className="bg-yellow-400 text-black font-bold" style={{ backgroundColor: '#facc15', color: '#000000' }}>
                         <tr>
                             <VerticalHeader className="w-[18%]">الدروس</VerticalHeader>
                             <VerticalHeader className="w-[7%]">معدل الفصل الاول</VerticalHeader>
@@ -127,24 +127,24 @@ export default function AdminReportCard({ student, classData, settings, studentR
                                                 <GradeCell value={grades.finalExam1st} className="bg-orange-100" />
                                             )}
                                             <GradeCell value={calculated.finalGradeWithDecision} className="bg-orange-100" />
-                                            <GradeCell value={grades.finalExam2nd} className="bg-pink-100" />
-                                            <GradeCell value={calculated.finalGrade2nd} className="bg-pink-100" />
+                                            <GradeCell value={grades.finalExam2nd} className="bg-pink-100" style={{ backgroundColor: '#fce7f3' }} />
+                                            <GradeCell value={calculated.finalGrade2nd} className="bg-pink-100" style={{ backgroundColor: '#fce7f3' }} />
                                         </>
                                     ) : (
                                         <>
-                                            <td className="border-2 border-black"></td>
-                                            <td className="border-2 border-black"></td>
-                                            <td className="border-2 border-black"></td>
-                                            <td className="border-2 border-black bg-orange-100"></td>
-                                            <td className="border-2 border-black bg-orange-100"></td>
-                                            <td className="border-2 border-black bg-orange-100"></td>
-                                            <td className="border-2 border-black bg-pink-100"></td>
-                                            <td className="border-2 border-black bg-pink-100"></td>
+                                            <td className="border-2 border-black" style={{ borderColor: '#000' }}></td>
+                                            <td className="border-2 border-black" style={{ borderColor: '#000' }}></td>
+                                            <td className="border-2 border-black" style={{ borderColor: '#000' }}></td>
+                                            <td className="border-2 border-black bg-orange-100" style={{ borderColor: '#000', backgroundColor: '#ffedd5' }}></td>
+                                            <td className="border-2 border-black bg-orange-100" style={{ borderColor: '#000', backgroundColor: '#ffedd5' }}></td>
+                                            <td className="border-2 border-black bg-orange-100" style={{ borderColor: '#000', backgroundColor: '#ffedd5' }}></td>
+                                            <td className="border-2 border-black bg-pink-100" style={{ borderColor: '#000', backgroundColor: '#fce7f3' }}></td>
+                                            <td className="border-2 border-black bg-pink-100" style={{ borderColor: '#000', backgroundColor: '#fce7f3' }}></td>
                                         </>
                                     )}
 
                                     {index === 0 && (
-                                        <td rowSpan={totalRows > 0 ? totalRows : 1} className="border-2 border-black align-middle">
+                                        <td rowSpan={totalRows > 0 ? totalRows : 1} className="border-2 border-black align-middle" style={{ borderColor: '#000' }}>
                                             {exportWithGrades && (
                                                 <div className="h-full w-full flex items-center justify-center relative">
                                                     <span 
@@ -176,7 +176,7 @@ export default function AdminReportCard({ student, classData, settings, studentR
 
                     <div className="text-center">
                         <p>درجة المواظبة النهائية</p>
-                        <div className="w-24 h-12 bg-fuchsia-500 text-white flex items-center justify-center font-bold mx-auto border-2 border-black mt-1">
+                        <div className="w-24 h-12 bg-fuchsia-500 text-white flex items-center justify-center font-bold mx-auto border-2 border-black mt-1" style={{ backgroundColor: '#d946ef', color: '#fff', borderColor: '#000' }}>
                             <span style={{ position: 'relative', bottom: '7px', fontWeight: 'bolder', fontSize: '1.75rem' }}>
                                 {student.examId}
                             </span>
